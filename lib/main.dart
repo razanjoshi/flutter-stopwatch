@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-void main() => runApp(TimerApp());
+void main() {
+  runApp(TimerApp( ));
+}
 
 class TimerApp extends StatefulWidget {
   @override
@@ -9,6 +11,25 @@ class TimerApp extends StatefulWidget {
     return new TimerAppState();
   }
 }
+
+
+class PageTwo extends State<TimerApp> {
+  @override
+  Widget build (BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).accentColor,
+        elevation: 1.0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.close))
+            // onPressed: ,
+        ]
+      ),
+    );
+  }
+}
+
 
 class TimerAppState extends State<TimerApp> {
   static const duration = const Duration(seconds: 1);
@@ -25,6 +46,8 @@ class TimerAppState extends State<TimerApp> {
       });
     }
   }
+
+  List<String> _laptime = [''];
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +101,7 @@ class TimerAppState extends State<TimerApp> {
                     setState(() {
                       isActive = false;
                       secondsPassed = 0;
+                      _laptime = [''];
                     });
                   },
                 ),
@@ -85,38 +109,31 @@ class TimerAppState extends State<TimerApp> {
 
               Container(
                 margin: EdgeInsets.only(top: 15),
-                child: FlatButton(
-                  child: Text('Page 2'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTwo(),
-                    );
+                child: RaisedButton(
+                  child: Text('Lap'),
+                  onPressed: () {
+                    setState(() {
+                      _laptime.add('lap time: ' + secondsPassed.toString());
+                    });
                   },
                 ),
               ),
+              Column(
+                children: _laptime
+                  .map((element) => Card(
+                        child: Column(
+                          children: <Widget>[
+                            Text(element)
+                          ],
+                        ),
+                      ))
+                  .toList()),
             ],
           ),
         ),
       ),
     );
   }
-}
-
-class PageTwo extends MaterialPageRoute<Null> {
-  PageTwo() : super(builder: (BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        elevation: 1.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.close))
-            // onPressed: ,
-        ]
-      ),
-    );
-  });
 }
 
 class CustomTextContainer extends StatelessWidget {
