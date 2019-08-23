@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './home_widget.dart';
 import 'dart:async';
 
 void main() {
@@ -12,28 +13,15 @@ class TimerApp extends StatefulWidget {
   }
 }
 
-
-class PageTwo extends State<TimerApp> {
-  @override
-  Widget build (BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        elevation: 1.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.close))
-            // onPressed: ,
-        ]
-      ),
-    );
-  }
-}
-
-
 class TimerAppState extends State<TimerApp> {
-  static const duration = const Duration(seconds: 1);
+  int _selectedPage = 0;
+  final _pageOptions = [
+    Colors.black,
+    Colors.white,
+    Colors.teal,
+  ];
 
+  static const duration = const Duration(seconds: 1);
   int secondsPassed = 0;
   bool isActive = false;
 
@@ -63,8 +51,31 @@ class TimerAppState extends State<TimerApp> {
     return MaterialApp(
       title: 'Welcome to Flutter',
       home: Scaffold(
+        backgroundColor: _pageOptions[_selectedPage],
         appBar: AppBar(
           title: Text("Razan's Stopwatch"),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedPage, // this will be set when a new tab is tapped
+          onTap: (int index) {
+            setState(() {
+              _selectedPage = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
+            ),
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.mail),
+              title: new Text('Messages'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text('Profile')
+            )
+          ],
         ),
         body: Center(
           child: Column(
@@ -113,7 +124,8 @@ class TimerAppState extends State<TimerApp> {
                   child: Text('Lap'),
                   onPressed: () {
                     setState(() {
-                      _laptime.add('lap time: ' + secondsPassed.toString());
+                      if (secondsPassed > 0)
+                        _laptime.add('lap time: ' + secondsPassed.toString());
                     });
                   },
                 ),
