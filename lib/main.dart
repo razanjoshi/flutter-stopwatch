@@ -15,6 +15,12 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage>{
   int _selectedPage = 0;
+  final _appBarTitle = [
+    'Welcome to Flutter',
+    'StopWatch',
+    'Lap Time Logs'
+  ];
+
   final _pageOptions = [
     Text('Home page'),
     TimerApp(),
@@ -26,7 +32,7 @@ class MainPageState extends State<MainPage>{
       title: 'Welcome to Flutter',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Welcome to Flutter'),
+          title: Text(_appBarTitle[_selectedPage]),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedPage, // this will be set when a new tab is tapped

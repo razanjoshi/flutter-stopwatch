@@ -43,9 +43,8 @@ class TimerAppState extends State<TimerApp> {
     int hours = secondsPassed ~/ (60 * 60);
 
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'Stopwatch',
       home: Scaffold(
-        
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
