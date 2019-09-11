@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import './lap_records.dart';
 import './stopwatch.dart';
+import './otb.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 void main() {
   runApp(MainPage( ));
@@ -16,23 +19,30 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage>{
   int _selectedPage = 0;
   final _appBarTitle = [
-    'Welcome to Flutter',
+    "Let's get you on the beach!",
     'StopWatch',
     'Lap Time Logs'
   ];
 
   final _pageOptions = [
-    Text('Home page'),
+    Otb(),
     TimerApp(),
-    Text('Lap Records'),
+    LapRecords(),
   ];
+
+  Color gradientStart = const Color(0xfffedc07); //Change start gradient color here
+  Color gradientEnd = const Color(0xffffffff);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'On The Beach',
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(_appBarTitle[_selectedPage]),
+        appBar: GradientAppBar(
+          title: Text(_appBarTitle[_selectedPage], style: TextStyle(color: Color(0xff17317f))),
+          backgroundColorStart: gradientStart,
+          backgroundColorEnd: gradientEnd,
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedPage, // this will be set when a new tab is tapped
