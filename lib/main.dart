@@ -1,174 +1,72 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import './lap_records.dart';
+import './stopwatch.dart';
+import './otb.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 void main() {
-  runApp(TimerApp( ));
+  runApp(MainPage( ));
 }
 
-class TimerApp extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return new TimerAppState();
+    return MainPageState();
   }
+
 }
 
+class MainPageState extends State<MainPage>{
+  int _selectedPage = 0;
+  final _appBarTitle = [
+    "Let's get you on the beach!",
+    'StopWatch',
+    'Lap Time Logs'
+  ];
 
-class PageTwo extends State<TimerApp> {
-  @override
-  Widget build (BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        elevation: 1.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.close))
-            // onPressed: ,
-        ]
-      ),
-    );
-  }
-}
+  final _pageOptions = [
+    Otb(),
+    TimerApp(),
+    LapRecords(),
+  ];
 
-
-class TimerAppState extends State<TimerApp> {
-  static const duration = const Duration(seconds: 1);
-
-  int secondsPassed = 0;
-  bool isActive = false;
-
-  Timer timer;
-
-  void handleTick() {
-    if (isActive) {
-      setState(() {
-        secondsPassed = secondsPassed + 1;
-      });
-    }
-  }
-
-  List<String> _laptime = [''];
+  Color gradientStart = const Color(0xfffedc07); //Change start gradient color here
+  Color gradientEnd = const Color(0xffffffff);
 
   @override
   Widget build(BuildContext context) {
-    if (timer == null)
-      timer = Timer.periodic(duration, (Timer t) {
-        handleTick();
-      });
-
-    int seconds = secondsPassed % 60;
-    int minutes = secondsPassed ~/ 60;
-    int hours = secondsPassed ~/ (60 * 60);
-
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'On The Beach',
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text("Razan's Stopwatch"),
+        appBar: GradientAppBar(
+          title: Text(_appBarTitle[_selectedPage], style: TextStyle(color: Color(0xff17317f))),
+          backgroundColorStart: gradientStart,
+          backgroundColorEnd: gradientEnd,
         ),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CustomTextContainer(
-                      label: 'HRS', value: hours.toString().padLeft(2, '0')),
-                  CustomTextContainer(
-                      label: 'MIN', value: minutes.toString().padLeft(2, '0')),
-                  CustomTextContainer(
-                      label: 'SEC', value: seconds.toString().padLeft(2, '0')),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 20),
-                child: RaisedButton(
-                  child: Text(isActive ? 'STOP' : 'START'),
-                  onPressed: () {
-                    setState(() {
-                      isActive = !isActive;
-                    });
-                  },
-                ),
-              ),
-
-              Container(
-                margin: EdgeInsets.only(top: 15),
-                child: RaisedButton(
-                  child: Text('RESET'),
-                  onPressed: () {
-                    setState(() {
-                      isActive = false;
-                      secondsPassed = 0;
-                      _laptime = [''];
-                    });
-                  },
-                ),
-              ),
-
-              Container(
-                margin: EdgeInsets.only(top: 15),
-                child: RaisedButton(
-                  child: Text('Lap'),
-                  onPressed: () {
-                    setState(() {
-                      _laptime.add('lap time: ' + secondsPassed.toString());
-                    });
-                  },
-                ),
-              ),
-              Column(
-                children: _laptime
-                  .map((element) => Card(
-                        child: Column(
-                          children: <Widget>[
-                            Text(element)
-                          ],
-                        ),
-                      ))
-                  .toList()),
-            ],
-          ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedPage, // this will be set when a new tab is tapped
+          onTap: (int index) {
+            setState(() {
+              _selectedPage = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
+            ),
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.mail),
+              title: new Text('Stopwatch'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text('LapTimes')
+            )
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class CustomTextContainer extends StatelessWidget {
-  CustomTextContainer({this.label, this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5),
-      padding: EdgeInsets.all(20),
-      decoration: new BoxDecoration(
-        borderRadius: new BorderRadius.circular(10),
-        color: Colors.black87,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            '$value',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 54,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            '$label',
-            style: TextStyle(
-              color: Colors.white70,
-            ),
-          )
-        ],
+        body: _pageOptions[_selectedPage],
       ),
     );
   }
