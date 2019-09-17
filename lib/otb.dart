@@ -6,6 +6,8 @@ import 'dart:convert';
 
 void main() => runApp(new Otb());
 
+String cnt;
+
 class Otb extends StatelessWidget {
   Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
   Color gradientEnd = const Color(0xffffffff);
@@ -50,12 +52,12 @@ class MyCustomForm extends StatefulWidget {
 class MyCustomFormState extends State<MyCustomForm> {
   final _formKey = GlobalKey<FormState>();
   
-  String url = 'http://localhost:3001/api/v1/search/holidays?country=UK';
+  String url = 'http://localhost:3001/api/v1/search/holidays?country=';
   // I have used my own private app's API endpoint here
 
-  Future<String> getData() async {
+  Future<String> getData(dynamic country) async {
     var response = await http.get(
-      Uri.encodeFull(url),
+      Uri.encodeFull(url+country),
       headers: {
         'Accept': 'application/json'
       }
@@ -64,7 +66,7 @@ class MyCustomFormState extends State<MyCustomForm> {
       List data = json.decode(response.body);
       print(data);
     } catch(_) {
-      print('WTF');
+      print('Authentication Error');
     }
   }
   @override
@@ -80,34 +82,24 @@ class MyCustomFormState extends State<MyCustomForm> {
             height: 150,
             width: 200,
           ),
-          TextFormField(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              labelText: 'Where To'
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter your destination.';
-              }
-              return null;
-            },
-          ),
+          DropdownExample(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                if (_formKey.currentState.validate()) {
+                if (!cnt.isEmpty && cnt != null) {
                   // If the form is valid, display a Snackbar.
                   Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Searching Holidays..')));
-                  getData();
-
-                  
+                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text('Searching Holidays..')));
+                  getData(cnt);
+                  print("Country: " + cnt);
+                }
+                else {
+                  Scaffold.of(context)
+                    .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("Validation error")));
                 }
               },
               textColor: Color(0xff17317f),
-              
               color: Colors.yellow,
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -120,3 +112,51 @@ class MyCustomFormState extends State<MyCustomForm> {
     );
   }
 }
+
+
+
+class DropdownExample extends StatefulWidget {
+    @override
+    _DropdownExampleState createState() {
+      return _DropdownExampleState();
+    }
+  }
+  
+  class _DropdownExampleState extends State<DropdownExample> {
+    String _value;
+  
+    @override
+    Widget build(BuildContext context) {
+      return Center(
+        
+        child: DropdownButton<String>(
+          items: [
+            DropdownMenuItem<String>(
+              child: Text('Malta'),
+              value: 'malta',
+            ),
+            DropdownMenuItem<String>(
+              child: Text('Kathmandu'),
+              value: 'ktm',
+            ),
+            DropdownMenuItem<String>(
+              child: Text('UK'),
+              value: 'UK',
+            ),
+          ],
+          onChanged: (String value) {
+            setState(() {
+              _value = value;
+              cnt = value;
+            });
+          },
+          hint: Text('Where To'),
+          value: _value,
+          iconEnabledColor: Colors.yellow,
+          isExpanded: true,
+          isDense: true,
+        ),
+      );
+    }
+  }
+
