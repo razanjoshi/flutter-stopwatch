@@ -87,11 +87,60 @@ class MyCustomFormState extends State<MyCustomForm> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                if (!cnt.isEmpty && cnt != null) {
+                if (cnt != null && !cnt.isEmpty) {
                   // If the form is valid, display a Snackbar.
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text('Searching Holidays..')));
                   getData(cnt);
+                  Navigator.push(context, MaterialPageRoute<void>(
+                    builder: (BuildContext context) {                
+                        return Scaffold(                
+                            appBar: AppBar(
+                                title:
+                                  Text(
+                                    "Holiday Results",
+                                  ), ),
+                              body: ListView(
+                                // child: FlatButton(
+                                //   child: Text('POP'),
+                                //   onPressed: () {
+                                //     Navigator.pop(context);
+                                //   },          
+                                // ), 
+                                children: <Widget>[
+                                  Container(
+                                        margin:EdgeInsets.all(8.0),
+                                        child: Card(
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                                            child: InkWell(
+                                              onTap: () => print("ciao"),     
+                                              child: Column(
+                                                    children: <Widget>[
+                                                        ClipRRect(
+                                                          borderRadius: BorderRadius.only(
+                                                            topLeft: Radius.circular(8.0),
+                                                            topRight: Radius.circular(8.0),
+                                                          ),
+                                                          child: Image.network(
+                                                            'https://i.onthebeach.co.uk/v1/hotel_images/7bc4f24e-2c59-4f6f-bd2e-8655c2cd5f1d/cover/767/620/medium/1.0/sol-tenerife',
+                                                            width: 300,
+                                                            height: 150,
+                                                            fit:BoxFit.fill  
+
+                                                          ),
+                                                        ),
+                                                        ListTile(
+                                                          title: Text('Sol Tenerife'),
+                                                          subtitle: Text('Tenerife'),
+                                                        ),
+                                                    ],
+                                              ),
+                                            ),
+                                        ),
+                                  ),
+                                ], 
+                              ),
+                          );
+                      },            
+                  ));          
                   print("Country: " + cnt);
                 }
                 else {
