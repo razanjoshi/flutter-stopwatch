@@ -49,6 +49,7 @@ class MainPageState extends State<MainPage>{
           onTap: (int index) {
             setState(() {
               _selectedPage = index;
+              cnt = '';
             });
           },
           items: [
