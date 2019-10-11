@@ -7,6 +7,7 @@ import 'dart:convert';
 void main() => runApp(new Otb());
 
 String cnt;
+List data;
 
 class Otb extends StatelessWidget {
   Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
@@ -63,8 +64,10 @@ class MyCustomFormState extends State<MyCustomForm> {
       }
     );
     try {
-      List data = json.decode(response.body);
-      print(data);
+      setState(() {
+        data = json.decode(response.body);
+      });
+      print(data.toString());
     } catch(_) {
       print('Authentication Error');
     }
@@ -87,9 +90,8 @@ class MyCustomFormState extends State<MyCustomForm> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                if (cnt != null && !cnt.isEmpty) {
-                  // If the form is valid, display a Snackbar.
-                  getData(cnt);
+                getData(cnt);
+                if (cnt != null && data.length != 0 ) {
                   Navigator.push(context, MaterialPageRoute<void>(
                     builder: (BuildContext context) {                
                         return Scaffold(                
@@ -98,45 +100,39 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   Text(
                                     "Holiday Results",
                                   ), ),
-                              body: ListView(
-                                // child: FlatButton(
-                                //   child: Text('POP'),
-                                //   onPressed: () {
-                                //     Navigator.pop(context);
-                                //   },          
-                                // ), 
-                                children: <Widget>[
-                                  Container(
-                                        margin:EdgeInsets.all(8.0),
-                                        child: Card(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                                            child: InkWell(
-                                              onTap: () => print("ciao"),     
-                                              child: Column(
-                                                    children: <Widget>[
-                                                        ClipRRect(
-                                                          borderRadius: BorderRadius.only(
-                                                            topLeft: Radius.circular(8.0),
-                                                            topRight: Radius.circular(8.0),
-                                                          ),
-                                                          child: Image.network(
-                                                            'https://i.onthebeach.co.uk/v1/hotel_images/7bc4f24e-2c59-4f6f-bd2e-8655c2cd5f1d/cover/767/620/medium/1.0/sol-tenerife',
-                                                            width: 300,
-                                                            height: 150,
-                                                            fit:BoxFit.fill  
+                              body: ListView.builder(
+                                itemCount: data == null? 0 : data.length,
+                                itemBuilder: (BuildContext context, i){
+                                  return Center(
+                                    child: Card(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                                        child: InkWell(
+                                          onTap: () => print("ciao"),     
+                                          child: Column(
+                                                children: <Widget>[
+                                                    ClipRRect(
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(8.0),
+                                                        topRight: Radius.circular(8.0),
+                                                      ),
+                                                      child: Image.network(
+                                                        'https://i.onthebeach.co.uk/v1/hotel_images/7bc4f24e-2c59-4f6f-bd2e-8655c2cd5f1d/cover/767/620/medium/1.0/sol-tenerife',
+                                                        // width: 600,
+                                                        // height: 300,
+                                                        fit:BoxFit.fill  
 
-                                                          ),
-                                                        ),
-                                                        ListTile(
-                                                          title: Text('Sol Tenerife'),
-                                                          subtitle: Text('Tenerife'),
-                                                        ),
-                                                    ],
-                                              ),
-                                            ),
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text(data[i]["country"]),
+                                                      subtitle: Text('Tenerife'),
+                                                    ),
+                                                ],
+                                          ),
                                         ),
-                                  ),
-                                ], 
+                                    ),
+                                  );
+                                }
                               ),
                           );
                       },            
@@ -161,8 +157,6 @@ class MyCustomFormState extends State<MyCustomForm> {
     );
   }
 }
-
-
 
 class DropdownExample extends StatefulWidget {
     @override
