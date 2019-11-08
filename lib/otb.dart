@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import './holiday_landing_page.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:stopwatch/holiday_landing_page.dart';
 
 
 void main() => runApp(new Otb());
@@ -56,21 +61,21 @@ class MyCustomFormState extends State<MyCustomForm> {
   String url = 'http://localhost:3001/api/v1/search/holidays?country=';
   // I have used my own private app's API endpoint here
 
-  Future<String> getData(dynamic country) async {
+  Future<String> getData(dynamic country) async{
+    final dest = url+country;
+    print("Inside function url: " + dest);
     var response = await http.get(
-      Uri.encodeFull(url+country),
+      Uri.encodeFull(dest),
       headers: {
         'Accept': 'application/json'
       }
     );
-    try {
-      setState(() {
-        data = json.decode(response.body);
-      });
-      print(data.toString());
-    } catch(_) {
-      print('Authentication Error');
-    }
+    setState(() {
+      Iterable result = json.decode(response.body);
+      data = result.toList();
+    });
+    print("Inside function country: " + country);
+    print("Inside function data: " + data.toString());
   }
   @override
   Widget build(BuildContext context) {
@@ -90,16 +95,25 @@ class MyCustomFormState extends State<MyCustomForm> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                getData(cnt);
-                if (cnt != null && data.length != 0 ) {
-                  Navigator.push(context, MaterialPageRoute<void>(
-                    builder: (BuildContext context) {                
-                        return Scaffold(                
-                            appBar: AppBar(
-                                title:
-                                  Text(
-                                    "Holiday Results",
-                                  ), ),
+                setState(() {});
+                if (cnt != null) {
+                  print("Country: " + cnt);
+                  getData(cnt);
+                  print("data" + data.toString());
+                  if (data.length != 0 ) {
+                    Navigator.push(context, MaterialPageRoute<void>(
+                      builder: (BuildContext context) {                
+                          return Scaffold(                
+                              appBar: PreferredSize(
+                                preferredSize: Size.fromHeight(10.0),
+                                child:  FlexibleSpaceBar(
+                                  centerTitle: true,
+                                  title: Text(data.length.toString() + " hotels found",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),),
+                                ),
+                              ),
                               body: ListView.builder(
                                 itemCount: data == null? 0 : data.length,
                                 itemBuilder: (BuildContext context, i){
@@ -107,7 +121,8 @@ class MyCustomFormState extends State<MyCustomForm> {
                                     child: Card(
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
                                         child: InkWell(
-                                          onTap: () => print("ciao"),     
+                                          onTap: () => Navigator.push(context, MaterialPageRoute<void>(
+                                                        builder: (BuildContext context) => new HolidayLandingPage(data[i]), ),),    
                                           child: Column(
                                                 children: <Widget>[
                                                     ClipRRect(
@@ -116,16 +131,15 @@ class MyCustomFormState extends State<MyCustomForm> {
                                                         topRight: Radius.circular(8.0),
                                                       ),
                                                       child: Image.network(
-                                                        'https://i.onthebeach.co.uk/v1/hotel_images/7bc4f24e-2c59-4f6f-bd2e-8655c2cd5f1d/cover/767/620/medium/1.0/sol-tenerife',
-                                                        // width: 600,
-                                                        // height: 300,
-                                                        fit:BoxFit.fill  
+                                                        data[i]["thumbnail_url"],
+                                                        fit:BoxFit.fill
 
                                                       ),
                                                     ),
                                                     ListTile(
-                                                      title: Text(data[i]["country"]),
-                                                      subtitle: Text('Tenerife'),
+                                                      title: Text(data[i]["hotel"]),
+                                                      subtitle: Text(data[i]["country"]),
+                                                      trailing: Text("£" + (data[i]["price"]).toString()),
                                                     ),
                                                 ],
                                           ),
@@ -134,15 +148,19 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   );
                                 }
                               ),
-                          );
-                      },            
-                  ));          
-                  print("Country: " + cnt);
-                }
-                else {
-                  Scaffold.of(context)
-                    .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("Validation error")));
-                }
+                            );
+                        },            
+                    ));          
+                  }
+                  else if(cnt != null && data.length == 0) {
+                    Scaffold.of(context)
+                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("No Holidays Found")));
+                  }
+                  else {
+                    Scaffold.of(context)
+                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("Validation error")));
+                  }
+                };
               },
               textColor: Color(0xff17317f),
               color: Colors.yellow,
@@ -171,35 +189,47 @@ class DropdownExample extends StatefulWidget {
     @override
     Widget build(BuildContext context) {
       return Center(
-        
-        child: DropdownButton<String>(
-          items: [
-            DropdownMenuItem<String>(
-              child: Text('Malta'),
-              value: 'malta',
-            ),
-            DropdownMenuItem<String>(
-              child: Text('Kathmandu'),
-              value: 'ktm',
-            ),
-            DropdownMenuItem<String>(
-              child: Text('UK'),
-              value: 'UK',
-            ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Container(
+              color: Colors.white,
+              child: DropdownButton<String>(
+                items: [
+                  DropdownMenuItem<String>(
+                    child: Text('Malta'),
+                    value: 'Malta',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('Spain'),
+                    value: 'Spain',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('France'),
+                    value: 'France',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('Dubai'),
+                    value: 'Dubai',
+                  ),
+                ],
+                onChanged: (String value) {
+                  setState(() {
+                    _value = value;
+                    cnt = value;
+                  });
+                },
+                hint: Text('Where To'),
+                value: _value,
+                iconEnabledColor: Colors.yellow,
+                isExpanded: true,
+                isDense: true,
+              ),
+            )
           ],
-          onChanged: (String value) {
-            setState(() {
-              _value = value;
-              cnt = value;
-            });
-          },
-          hint: Text('Where To'),
-          value: _value,
-          iconEnabledColor: Colors.yellow,
-          isExpanded: true,
-          isDense: true,
-        ),
-      );
+          
+      ));
     }
   }
 
