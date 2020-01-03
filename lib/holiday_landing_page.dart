@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './passengers.dart';
 
 class HolidayLandingPage extends StatelessWidget {
   HolidayLandingPage(this.data);
@@ -62,11 +63,17 @@ class HolidayLandingPage extends StatelessWidget {
                           minWidth: 600.0,
                           height: 50.0,
                           child: RaisedButton(
-                            onPressed: () {},
                             child: Text("BOOK NOW"),
                             color: Colors.yellow,
                             textColor: Color(0xff17317f),
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute<void>(
+                                builder: (BuildContext context) => new Passengers(data),
+                              
                           ),
+                        );
+                      }
+                      )
                         )
                     ],
               ),

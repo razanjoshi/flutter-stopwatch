@@ -12,7 +12,6 @@ import 'package:stopwatch/holiday_landing_page.dart';
 void main() => runApp(new Otb());
 
 String cnt;
-List data;
 
 class Otb extends StatelessWidget {
   Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
@@ -57,14 +56,15 @@ class MyCustomForm extends StatefulWidget {
 
 class MyCustomFormState extends State<MyCustomForm> {
   final _formKey = GlobalKey<FormState>();
-  
+  dynamic data;
+  dynamic response; 
   String url = 'http://localhost:3001/api/v1/search/holidays?country=';
   // I have used my own private app's API endpoint here
 
   Future<String> getData(dynamic country) async{
     final dest = url+country;
     print("Inside function url: " + dest);
-    var response = await http.get(
+    response = await http.get(
       Uri.encodeFull(dest),
       headers: {
         'Accept': 'application/json'
@@ -99,11 +99,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                 if (cnt != null) {
                   print("Country: " + cnt);
                   getData(cnt);
-                  print("data" + data.toString());
+                  data == null ? 0 : data;
+                  print("data: " + data.toString());
                   if (data.length != 0 ) {
                     Navigator.push(context, MaterialPageRoute<void>(
                       builder: (BuildContext context) {                
-                          return Scaffold(                
+                          return Scaffold(       
                               appBar: PreferredSize(
                                 preferredSize: Size.fromHeight(10.0),
                                 child:  FlexibleSpaceBar(
