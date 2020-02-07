@@ -14,23 +14,31 @@ class PayWithCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text('Pay with your card',
+              style: TextStyle(
+              color: Colors.grey[800],
+              fontWeight: FontWeight.bold,
+              fontSize: 40)),
+
             new Row(
               children: <Widget>[
                 new Image.asset('assets/images/blank-card.jpg',
-                  // scale: 0.8,
                   height: 200,
                   width: 400,
-                  // fit:BoxFit.fill
                   )
               ],
             ),
-            RaisedButton(
-              child: Text('Pay by Card'),
-              textColor: Color(0xff17317f),
-              color: Colors.yellow,
-              onPressed: () {
-                _pay();
-              },
+
+            ButtonTheme(
+              minWidth: 345.0,
+              child: RaisedButton(
+                child: Text('PAY NOW'),
+                textColor: Color(0xff17317f),
+                color: Colors.yellow,
+                onPressed: () {
+                  _pay();
+                },
+              ),
             )
           ],
         ),

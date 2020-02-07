@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import './holiday_landing_page.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 import 'package:stopwatch/holiday_landing_page.dart';
 
@@ -12,10 +13,11 @@ import 'package:stopwatch/holiday_landing_page.dart';
 void main() => runApp(new Otb());
 
 String cnt;
+Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
+Color gradientEnd = const Color(0xffffffff);
 
 class Otb extends StatelessWidget {
-  Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
-  Color gradientEnd = const Color(0xffffffff);
+  
   @override
   Widget build(BuildContext context) {
     final appTitle = 'Form Validation Demo';
@@ -24,6 +26,11 @@ class Otb extends StatelessWidget {
       title: appTitle,
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: GradientAppBar(
+      title: Text("Let's get you to the beach", style: TextStyle(color: Color(0xff17317f))),
+      backgroundColorStart: gradientStart,
+      backgroundColorEnd: gradientEnd,
+    ),
         body: new Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -105,15 +112,20 @@ class MyCustomFormState extends State<MyCustomForm> {
                     Navigator.push(context, MaterialPageRoute<void>(
                       builder: (BuildContext context) {                
                           return Scaffold(       
-                              appBar: PreferredSize(
-                                preferredSize: Size.fromHeight(10.0),
-                                child:  FlexibleSpaceBar(
-                                  centerTitle: true,
-                                  title: Text(data.length.toString() + " hotels found",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),),
-                                ),
+                              // appBar: PreferredSize(
+                              //   preferredSize: Size.fromHeight(10.0),
+                              //   child:  FlexibleSpaceBar(
+                              //     centerTitle: true,
+                              //     title: Text(data.length.toString() + " hotels found",
+                              //     style: TextStyle(
+                              //       color: Colors.black,
+                              //     ),),
+                              //   ),
+                              // ),
+                              appBar: GradientAppBar(
+                                title: Text(data.length.toString() + " hotels found", style: TextStyle(color: Color(0xff17317f))),
+                                backgroundColorStart: gradientStart,
+                                backgroundColorEnd: gradientEnd,
                               ),
                               body: ListView.builder(
                                 itemCount: data == null? 0 : data.length,
