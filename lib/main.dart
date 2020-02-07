@@ -16,6 +16,8 @@ class MainPage extends StatefulWidget {
 
 }
 
+int tabNumber =  0;
+
 class MainPageState extends State<MainPage>{
   int _selectedPage = 0;
   final _appBarTitle = [
@@ -35,20 +37,26 @@ class MainPageState extends State<MainPage>{
 
   @override
   Widget build(BuildContext context) {
+    var appBarCondition = GradientAppBar(
+      title: Text(_appBarTitle[_selectedPage], style: TextStyle(color: Color(0xff17317f))),
+      backgroundColorStart: gradientStart,
+      backgroundColorEnd: gradientEnd,
+    );
+
     return MaterialApp(
       title: 'On The Beach',
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: GradientAppBar(
-          title: Text(_appBarTitle[_selectedPage], style: TextStyle(color: Color(0xff17317f))),
-          backgroundColorStart: gradientStart,
-          backgroundColorEnd: gradientEnd,
-        ),
+
+        appBar: (_selectedPage > 0) ? appBarCondition : null,
+
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedPage, // this will be set when a new tab is tapped
           onTap: (int index) {
             setState(() {
               _selectedPage = index;
+              tabNumber = index;
+              cnt = '';
             });
           },
           items: [
@@ -71,3 +79,4 @@ class MainPageState extends State<MainPage>{
     );
   }
 }
+

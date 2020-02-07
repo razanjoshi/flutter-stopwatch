@@ -1,14 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import './holiday_landing_page.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
+
+import 'package:stopwatch/holiday_landing_page.dart';
 
 
 void main() => runApp(new Otb());
 
+String cnt;
+Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
+Color gradientEnd = const Color(0xffffffff);
+
 class Otb extends StatelessWidget {
-  Color gradientStart = const Color(0xff00b5ea); //Change start gradient color here
-  Color gradientEnd = const Color(0xffffffff);
+  
   @override
   Widget build(BuildContext context) {
     final appTitle = 'Form Validation Demo';
@@ -17,6 +26,11 @@ class Otb extends StatelessWidget {
       title: appTitle,
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: GradientAppBar(
+      title: Text("Let's get you to the beach", style: TextStyle(color: Color(0xff17317f))),
+      backgroundColorStart: gradientStart,
+      backgroundColorEnd: gradientEnd,
+    ),
         body: new Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -49,23 +63,26 @@ class MyCustomForm extends StatefulWidget {
 
 class MyCustomFormState extends State<MyCustomForm> {
   final _formKey = GlobalKey<FormState>();
-  
-  String url = 'http://localhost:3001/api/v1/search/holidays?country=UK';
+  dynamic data;
+  dynamic response; 
+  String url = 'http://localhost:3001/api/v1/search/holidays?country=';
   // I have used my own private app's API endpoint here
 
-  Future<String> getData() async {
-    var response = await http.get(
-      Uri.encodeFull(url),
+  Future<String> getData(dynamic country) async{
+    final dest = url+country;
+    print("Inside function url: " + dest);
+    response = await http.get(
+      Uri.encodeFull(dest),
       headers: {
         'Accept': 'application/json'
       }
     );
-    try {
-      List data = json.decode(response.body);
-      print(data);
-    } catch(_) {
-      print('WTF');
-    }
+    setState(() {
+      Iterable result = json.decode(response.body);
+      data = result.toList();
+    });
+    print("Inside function country: " + country);
+    print("Inside function data: " + data.toString());
   }
   @override
   Widget build(BuildContext context) {
@@ -80,34 +97,85 @@ class MyCustomFormState extends State<MyCustomForm> {
             height: 150,
             width: 200,
           ),
-          TextFormField(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              labelText: 'Where To'
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter your destination.';
-              }
-              return null;
-            },
-          ),
+          DropdownExample(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: RaisedButton(
               onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  // If the form is valid, display a Snackbar.
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Searching Holidays..')));
-                  getData();
+                setState(() {});
+                if (cnt != null) {
+                  print("Country: " + cnt);
+                  getData(cnt);
+                  data == null ? 0 : data;
+                  print("data: " + data.toString());
+                  if (data.length != 0 ) {
+                    Navigator.push(context, MaterialPageRoute<void>(
+                      builder: (BuildContext context) {                
+                          return Scaffold(       
+                              // appBar: PreferredSize(
+                              //   preferredSize: Size.fromHeight(10.0),
+                              //   child:  FlexibleSpaceBar(
+                              //     centerTitle: true,
+                              //     title: Text(data.length.toString() + " hotels found",
+                              //     style: TextStyle(
+                              //       color: Colors.black,
+                              //     ),),
+                              //   ),
+                              // ),
+                              appBar: GradientAppBar(
+                                title: Text(data.length.toString() + " hotels found", style: TextStyle(color: Color(0xff17317f))),
+                                backgroundColorStart: gradientStart,
+                                backgroundColorEnd: gradientEnd,
+                              ),
+                              body: ListView.builder(
+                                itemCount: data == null? 0 : data.length,
+                                itemBuilder: (BuildContext context, i){
+                                  return Center(
+                                    child: Card(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                                        child: InkWell(
+                                          onTap: () => Navigator.push(context, MaterialPageRoute<void>(
+                                                        builder: (BuildContext context) => new HolidayLandingPage(data[i]), ),),    
+                                          child: Column(
+                                                children: <Widget>[
+                                                    ClipRRect(
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(8.0),
+                                                        topRight: Radius.circular(8.0),
+                                                      ),
+                                                      child: Image.network(
+                                                        data[i]["thumbnail_url"],
+                                                        fit:BoxFit.fill
 
-                  
-                }
+                                                      ),
+                                                    ),
+                                                    ListTile(
+                                                      title: Text(data[i]["hotel"]),
+                                                      subtitle: Text(data[i]["country"]),
+                                                      trailing: Text("£" + (data[i]["price"]).toString()),
+                                                    ),
+                                                ],
+                                          ),
+                                        ),
+                                    ),
+                                  );
+                                }
+                              ),
+                            );
+                        },            
+                    ));          
+                  }
+                  else if(cnt != null && data.length == 0) {
+                    Scaffold.of(context)
+                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("No Holidays Found")));
+                  }
+                  else {
+                    Scaffold.of(context)
+                      .showSnackBar(SnackBar(duration: Duration(seconds: 1), content: Text("Validation error")));
+                  }
+                };
               },
               textColor: Color(0xff17317f),
-              
               color: Colors.yellow,
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -120,3 +188,61 @@ class MyCustomFormState extends State<MyCustomForm> {
     );
   }
 }
+
+class DropdownExample extends StatefulWidget {
+    @override
+    _DropdownExampleState createState() {
+      return _DropdownExampleState();
+    }
+  }
+  
+  class _DropdownExampleState extends State<DropdownExample> {
+    String _value;
+  
+    @override
+    Widget build(BuildContext context) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Container(
+              color: Colors.white,
+              child: DropdownButton<String>(
+                items: [
+                  DropdownMenuItem<String>(
+                    child: Text('Malta'),
+                    value: 'Malta',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('Spain'),
+                    value: 'Spain',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('France'),
+                    value: 'France',
+                  ),
+                  DropdownMenuItem<String>(
+                    child: Text('Dubai'),
+                    value: 'Dubai',
+                  ),
+                ],
+                onChanged: (String value) {
+                  setState(() {
+                    _value = value;
+                    cnt = value;
+                  });
+                },
+                hint: Text('Where To'),
+                value: _value,
+                iconEnabledColor: Colors.yellow,
+                isExpanded: true,
+                isDense: true,
+              ),
+            )
+          ],
+          
+      ));
+    }
+  }
+
